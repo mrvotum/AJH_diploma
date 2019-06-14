@@ -111,6 +111,7 @@ export default class AddImages {
           messageList.appendChild(spanEl);
           spanEl.appendChild(previewEl);
           // прокрутка вниз к новым сообщениям
+          // eslint-disable-next-line no-param-reassign
           messageList.scrollTop = messageList.scrollHeight;
         }
       }

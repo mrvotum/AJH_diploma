@@ -5,6 +5,7 @@ export default class API {
   }
 
   load() {
+    console.log('команда загрузки из апи');
     return fetch(this.url);
   }
 
@@ -20,6 +21,14 @@ export default class API {
   addFavorite(message) {
     console.log('__________');
     console.log(message);
+    return fetch(this.url, {
+      body: JSON.stringify(message),
+      method: 'POST',
+      headers: this.contentTypeHeader,
+    });
+  }
+
+  addNewMessage(message) {
     return fetch(this.url, {
       body: JSON.stringify(message),
       method: 'POST',

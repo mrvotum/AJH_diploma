@@ -1,3 +1,5 @@
+/* eslint-disable no-useless-escape */
+/* eslint-disable no-mixed-operators */
 /* eslint-disable class-methods-use-this */
 import AddImages from './class_addImages';
 import Geoposition from './Geoposition';
@@ -13,6 +15,7 @@ export default class Widget {
     this.clipBtn = document.querySelector('[data-id=clip]');
     this.uploadForm = document.querySelector('[data-id=upload-form]');
     this.onlyOneBtnsHolder = true;
+    this.favoriteMessagesList = false;
     this.pinnedOpen = false;
     this.pinnedMessage = null;
     // this.ws = new WebSocket('ws://eleven-three.herokuapp.com/ws');
@@ -53,6 +56,8 @@ export default class Widget {
     this.addListeners();
     const addImages = new AddImages();
     addImages.create();
+
+    this.loadMessages();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -106,18 +111,21 @@ export default class Widget {
 
     this.messageList.addEventListener('click', (event) => {
       if (event.target.classList.value === 'image') {
-        event.target.classList.value = 'imageZoom';
-        event.target.parentElement.classList.value = 'messageZoomImg';
+        const ev = event;
+        ev.target.classList.value = 'imageZoom';
+        ev.target.parentElement.classList.value = 'messageZoomImg';
       } else if (event.target.classList.value === 'imageZoom') {
-        event.target.classList.value = 'image';
-        event.target.parentElement.classList.value = 'message';
+        const ev = event;
+        ev.target.classList.value = 'image';
+        ev.target.parentElement.classList.value = 'message';
       } else if (event.target.classList.value === 'geopos') {
         console.log('пытаюсь скопировать');
         const copyEl = document.createElement('INPUT');
         copyEl.setAttribute('type', 'text');
+        copyEl.setAttribute('data-id', 'copy');
         copyEl.setAttribute('value', event.target.textContent);
         document.body.appendChild(copyEl);
-        document.querySelector('INPUT').select();
+        document.querySelector('[data-id=copy]').select();
         document.execCommand('copy');
         copyEl.remove();
       }
@@ -147,7 +155,7 @@ export default class Widget {
       }
     });
 
-    this.messageList.addEventListener('scroll', (event) => {
+    this.messageList.addEventListener('scroll', () => {
       if (this.pinnedMessage !== null) {
         this.pinnedMessage.style.top = `${this.messageList.scrollTop}px`;
       }
@@ -171,17 +179,18 @@ export default class Widget {
 
         let message = messageInput.value;
         const reg = /((([A-Za-z]{3,9}):\/\/)*?([-;:&=\+\$,\w]+@{1})?(([-A-Za-z0-9]+\.)+[A-Za-z]{2,3})(:\d+)?((\/[-\+~%\/\.\w]+)?\/?([&?][-\+=&;%@\.\w]+)?(#[\w]+)?)?)/igm;
-        // const pregMatch = message.match(reg);
         message = message.replace(reg, '<a class="link" href="$1">$1</a>');
 
         spanEl.innerHTML = message;
-        // spanEl.innerHTML = `<span>${message}</span>`;
 
         this.messageList.appendChild(spanEl);
 
         // прокрутка вниз к новым сообщениям
         this.messageList.scrollTop = this.messageList.scrollHeight;
         messageInput.value = '';
+
+        const api = new API('http://localhost:7075/newMessage');
+        this.toServerNewMessage(spanEl.id, spanEl.textContent, api);
       }
     });
   }
@@ -194,9 +203,16 @@ export default class Widget {
 
     this.favoriteMessageBtn = document.querySelector('[data-id=favorite]');
     this.favoriteMessageBtn.addEventListener('click', () => {
-      const favoriteMessages = document.querySelectorAll('messageType', 'favorite');
-      console.log(favoriteMessages);
-      console.log('смотрим на лайкнутые');
+      // const favoriteMessages = document.querySelectorAll('messageType', 'favorite');
+      if (!this.favoriteMessagesList) {
+        console.log('смотрим на лайкнутые');
+        this.loadFavoriteMessages();
+        this.favoriteMessagesList = true;
+      } else {
+        const favoriteMessagesList = document.querySelector('[data-id=favoriteMessagesList]');
+        favoriteMessagesList.remove();
+        this.favoriteMessagesList = false;
+      }
     });
   }
 
@@ -239,10 +255,18 @@ export default class Widget {
           // отправляем на сервер
           const api = new API('http://localhost:7075/addFavorite');
           // console.log(localParent.textContent);
-          this.toServerNewFavorite(localParent.id, localParent.firstChild.textContent, api);
+          this.toServerNewFavorite(localParent.id, localParent.textContent, api);
         } else {
           localParent.setAttribute('messageType', 'regular');
           localParent.classList.remove('favorite');
+          console.log('Удаляем из избранного');
+
+          // удаление с сервера
+          const idEl = localParent.id;
+          const api = new API('http://localhost:7075/dellFavorite');
+          console.info(`id for delete = ${idEl}`);
+          this.removeElById(api, idEl);
+          // удаление с сервера
         }
       });
     }
@@ -271,15 +295,16 @@ export default class Widget {
     });
   }
 
-  toServerNewFavorite(id, text, api) {
+  toServerNewMessage(id, text, api) {
     const locId = id;
     const locText = text;
     const locApi = api;
     // console.log('mytext: ' + locText);
 
     async function addNewTaskToServer() {
-      // добавляем тикет
-      const TicketFull = await locApi.addFavorite({
+      // добавляем сообщение в избранное на сервере
+      // eslint-disable-next-line no-unused-vars
+      const newMessage = await locApi.addNewMessage({
         id: locId,
         text: locText,
       });
@@ -287,4 +312,120 @@ export default class Widget {
 
     addNewTaskToServer();
   }
+
+  toServerNewFavorite(id, text, api) {
+    const locId = id;
+    const locText = text;
+    const locApi = api;
+    // console.log('mytext: ' + locText);
+
+    async function addNewTaskToServer() {
+      // добавляем сообщение в избранное на сервере
+      // eslint-disable-next-line no-unused-vars
+      const favoriteMessage = await locApi.addFavorite({
+        id: locId,
+        text: locText,
+      });
+    }
+
+    addNewTaskToServer();
+  }
+
+
+  // работа с сервером
+  loadFavoriteMessages() {
+    console.log('Загружаю с сервера избранные...');
+    const api = new API('http://localhost:7075/showFavorite');
+    this.fromServerFavorite(api);
+  }
+
+  loadMessages() {
+    console.log('Загружаю с сервера данные...');
+    const api = new API('http://localhost:7075/showMessages');
+    this.fromServerMessages(api);
+  }
+
+  fromServerFavorite(api) {
+    const colApi = api;
+
+    async function loadFromServer() {
+      const favoriteMessages = await colApi.load();
+      const data = await favoriteMessages.json();
+      console.log('Вызываю избранные сообщения');
+      console.log(data);
+
+      const divEl = document.createElement('div');
+      divEl.className = 'favoriteMessagesList';
+      divEl.setAttribute('data-id', 'favoriteMessagesList');
+
+      const messageList = document.querySelector('[data-id=messageList]');
+      messageList.appendChild(divEl);
+
+      // для каждого элемента из БД сервера
+      for (let i = 0; i < data.length; i += 1) {
+        let messageText = data[i].text;
+
+        const spanEl = document.createElement('span');
+        spanEl.id = data[i].id;
+        spanEl.classList = 'message favorite';
+        spanEl.setAttribute('messageType', 'favorite');
+        spanEl.textContent = messageText;
+
+        const reg = /((([A-Za-z]{3,9}):\/\/)*?([-;:&=\+\$,\w]+@{1})?(([-A-Za-z0-9]+\.)+[A-Za-z]{2,3})(:\d+)?((\/[-\+~%\/\.\w]+)?\/?([&?][-\+=&;%@\.\w]+)?(#[\w]+)?)?)/igm;
+        messageText = messageText.replace(reg, '<a class="link" href="$1">$1</a>');
+        spanEl.innerHTML = messageText;
+
+        divEl.appendChild(spanEl);
+      }
+    }
+
+    loadFromServer();
+  }
+
+  fromServerMessages(api) {
+    const colApi = api;
+
+    async function loadFromServer() {
+      const messages = await colApi.load();
+      const data = await messages.json();
+      console.log('Вызываю старые сообщения');
+
+      const messageList = document.querySelector('[data-id=messageList]');
+
+      // для каждого элемента из БД сервера
+      for (let i = 0; i < data.length; i += 1) {
+        let messageText = data[i].text;
+
+        const spanEl = document.createElement('span');
+        spanEl.id = data[i].id;
+
+        if (data[i].messageType === 'favorite') {
+          spanEl.classList = 'message favorite';
+        } else {
+          spanEl.classList = 'message';
+        }
+
+        spanEl.setAttribute('messageType', 'regular');
+
+        const reg = /((([A-Za-z]{3,9}):\/\/)*?([-;:&=\+\$,\w]+@{1})?(([-A-Za-z0-9]+\.)+[A-Za-z]{2,3})(:\d+)?((\/[-\+~%\/\.\w]+)?\/?([&?][-\+=&;%@\.\w]+)?(#[\w]+)?)?)/igm;
+        messageText = messageText.replace(reg, '<a class="link" href="$1">$1</a>');
+        spanEl.innerHTML = messageText;
+
+
+        messageList.appendChild(spanEl);
+      }
+    }
+
+    loadFromServer();
+  }
+
+  removeElById(api, idEl) {
+    async function deleteEl(id) {
+      // eslint-disable-next-line no-unused-vars
+      const favoriteMessages = await api.remove(id);
+    }
+
+    deleteEl(idEl);
+  }
+  // работа с сервером
 }
