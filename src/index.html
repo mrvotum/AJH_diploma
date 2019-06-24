@@ -10,7 +10,7 @@
 
 <main>
   <div data-id="widgetHolder" class="widget">
-    <div class="widgetBody">
+    <div data-id="widgetBody" class="widgetBody">
       <div class="topMenu">
         <span data-id="burgerMenu" class="burgerMenu"></span>
         <span class="attachments"></span>
@@ -28,16 +28,11 @@
         </svg>
       </div>
       <div data-id="messageList" class="messageList">
-        <!-- <div class="favoriteMessagesList">
-          <span class="message favorite" messagetype="favorite">Снова много текста, ну или не очень много, но он есть</span>
-          <span class="message favorite" messagetype="favorite">Текстовое сообщение 1</span>
-          <span class="message favorite" messagetype="favorite">Ещё текст в избранном</span>
-        </div> -->
-        <span data-id="kek" class="message"></span>
         <span messageType="regular" class="message favorite">
           Тут просто некоторое сообщение
         </span>
       </div>
+      <!-- Форма для фотографий -->
       <form data-id="upload-form" class="imgForm">
         <div data-id="drop-area" class="file-container drop-area">
           <span data-id="overlap" class="overlap">Drag and drop files here</span>
@@ -45,6 +40,14 @@
           <input type="text" class="overlapped" name="name" value="My Photo">
         </div>
       </form>
+      <!-- Форма для фотографий -->
+      <!-- Менеджер загрузок))))) -->
+      <form class="imgForm" data-id="formFile" novalidate>
+        <span data-id="overlapFile" class="overlaFilep">Click there for uploading files</span>
+        <div data-id="file-containerFile" class="file-container"></div>
+        <input data-id="fileFile" class="overlappedFile" type="file" multiple>
+      </form>
+      <!-- Менеджер загрузок))))) -->
       <textarea data-id="messageInput" class="messageInput"></textarea>
     </div>
   </div>

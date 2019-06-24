@@ -4,6 +4,7 @@
 import AddImages from './class_addImages';
 import Geoposition from './Geoposition';
 import API from './api';
+import AddFile from './class_addFile';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const uuid = require('uuid');
@@ -14,6 +15,7 @@ export default class Widget {
     this.messageList = document.querySelector('[data-id=messageList]');
     this.clipBtn = document.querySelector('[data-id=clip]');
     this.uploadForm = document.querySelector('[data-id=upload-form]');
+    this.formFile = document.querySelector('[data-id=formFile]');
     this.onlyOneBtnsHolder = true;
     this.favoriteMessagesList = false;
     this.pinnedOpen = false;
@@ -27,31 +29,6 @@ export default class Widget {
   }
 
   makingBody() {
-    const kek = document.querySelector('[data-id=kek]');
-    const imgEl = document.createElement('img');
-    imgEl.setAttribute('data-id', 'img_1'); // тут будет имя картинки/фотографии потом
-    imgEl.classList.add('image');
-    // imgEl.classList.add('imageZoom');
-    imgEl.src = './img/img_2.png';
-    kek.appendChild(imgEl);
-
-    // const divEl = document.createElement('div');
-    // divEl.className = 'widgetBody';
-    // divEl.innerHTML = `<div class="dateHolder">
-    //   <span class="date">${timeNow}</span>
-    // </div>
-    // <div class="status">
-    //   <span class="title">Server:</span>
-    //   <span class="serverId">${serverId}</span>
-    // </div>
-    // <div class="actions">
-    //   <span class="title">Info:</span>
-    //   <span class="serverInfo">${logText}</span>
-    // </div>`;
-
-    // const worklog = this.parent.querySelector('[data-id=worklog]');
-    // worklog.appendChild(divEl);
-
     console.log('мутим основное меню');
     this.addListeners();
     const addImages = new AddImages();
@@ -91,16 +68,13 @@ export default class Widget {
         const ulEl = document.createElement('ul');
         ulEl.className = 'burgerMenuUl';
         ulEl.innerHTML = `
-        <li data-id="clipPhoto" class="burgerMenuList">Прикрепить фотографию</li>`;
-        // <li data-id="clipFile" class="burgerMenuList">Прикрепить документ</li>`;
+        <li data-id="clipPhoto" class="burgerMenuList">Прикрепить фотографию</li>
+        <li data-id="clipFile" class="burgerMenuList">Прикрепить документ</li>`;
         burgerMenu.appendChild(ulEl);
         openedClipMenu = true;
         openedBurgerMenu = false;
 
-        const addImages = new AddImages();
-        addImages.addClipListener();
-        this.uploadForm.classList.remove('imgForm');
-        this.uploadForm.classList.add('imgFormShow');
+        this.addListenersForClipFunctions();
       } else if (openedClipMenu && !openedBurgerMenu) {
         burgerMenu.firstChild.remove();
         openedClipMenu = false;
@@ -167,6 +141,7 @@ export default class Widget {
       // }
     });
 
+    // сообщения в виде сообщений))
     const messageInput = document.querySelector('[data-id=messageInput]');
     messageInput.addEventListener('keypress', (event) => {
       if (event.charCode === 13) {
@@ -192,6 +167,27 @@ export default class Widget {
         const api = new API('http://localhost:7075/newMessage');
         this.toServerNewMessage(spanEl.id, spanEl.textContent, api);
       }
+    });
+  }
+
+  addListenersForClipFunctions() {
+    const clipPhoto = document.querySelector('[data-id=clipPhoto]');
+    const clipFile = document.querySelector('[data-id=clipFile]');
+
+    clipPhoto.addEventListener('click', () => {
+      const addImages = new AddImages();
+      addImages.addClipListener();
+
+      this.uploadForm.classList.remove('imgForm');
+      this.uploadForm.classList.add('imgFormShow');
+    });
+
+    clipFile.addEventListener('click', () => {
+      const addFile = new AddFile();
+      addFile.create();
+
+      this.formFile.classList.remove('imgForm');
+      this.formFile.classList.add('imgFormShow');
     });
   }
 
