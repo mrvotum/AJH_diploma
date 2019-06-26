@@ -1,3 +1,6 @@
+/* eslint-disable no-loop-func */
+import API from './api';
+
 export default class AddFile {
   constructor() {
     this.form = document.querySelector('[data-id=formFile]');
@@ -51,6 +54,23 @@ export default class AddFile {
       this.messageList.scrollTop = this.messageList.scrollHeight;
 
       this.addDownloadListener(spanEl.id);
+
+
+      // ПРОБУЕМ ОТПРАВИТЬ НА СЕРВЕР
+      const formData = new FormData(this.form);
+      const xhr = new XMLHttpRequest();
+
+      xhr.open('POST', 'http://localhost:7075'); // 'https://seven-three.herokuapp.com');
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200) {
+          URL.revokeObjectURL(`http://localhost:7075${xhr.response}`);
+        }
+      });
+
+      xhr.send(formData);
+      // ПРОБУЕМ ОТПРАВИТЬ НА СЕРВЕР
+
 
       this.fileEl.value = '';
     }

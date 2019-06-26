@@ -18,6 +18,15 @@ export default class API {
     });
   }
 
+  // addFile(files) {
+  //   // this.url = http://localhost:7075/files
+  //   return fetch(this.url, {
+  //     body: JSON.stringify(files),
+  //     method: 'POST',
+  //     headers: this.contentTypeHeader,
+  //   });
+  // }
+
   addFavorite(message) {
     console.log('__________');
     console.log(message);
