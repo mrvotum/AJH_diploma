@@ -1,5 +1,5 @@
 /* eslint-disable no-loop-func */
-import API from './api';
+// import API from './api';
 
 export default class AddFile {
   constructor() {

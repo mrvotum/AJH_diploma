@@ -26,7 +26,7 @@ export default class Geoposition {
     this.geoposition = geoposition;
     const spanEl = document.createElement('span');
     spanEl.className = 'message';
-    // eslint-disable-next-line import/no-extraneous-dependencies
+    // eslint-disable-next-line global-require
     const uuid = require('uuid');
     spanEl.id = uuid.v4();
     spanEl.innerHTML = `
@@ -44,7 +44,7 @@ export default class Geoposition {
     const locId = id;
     const locText = text;
     const locApi = api;
-    console.log('mytext: ' + locText);
+    // console.log('mytext: ' + locText);
 
     async function addNewTaskToServer() {
       // eslint-disable-next-line no-unused-vars

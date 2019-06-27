@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/nohot1xs62tdm058?svg=true)](https://ci.appveyor.com/project/mrvotum/kekekek)
+[![Build status](https://ci.appveyor.com/api/projects/status/wfut5b68ro0j5tbw/branch/master?svg=true)](https://ci.appveyor.com/project/mrvotum/ajh-diploma/branch/master)
 
 # AHJ. ImageManager
 
