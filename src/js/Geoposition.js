@@ -35,7 +35,7 @@ export default class Geoposition {
 
     this.parent.scrollTop = this.parent.scrollHeight;
 
-    const api = new API('http://localhost:7075/newMessage');
+    const api = new API('https://ajh-diploma.herokuapp.com/newMessage');
     this.toServerNewMessage(spanEl.id, spanEl.textContent, api);
   }
 

@@ -60,11 +60,11 @@ export default class AddFile {
       const formData = new FormData(this.form);
       const xhr = new XMLHttpRequest();
 
-      xhr.open('POST', 'http://localhost:7075'); // 'https://seven-three.herokuapp.com');
+      xhr.open('POST', 'https://ajh-diploma.herokuapp.com'); // 'http://localhost:7075');
 
       xhr.addEventListener('load', () => {
         if (xhr.status === 200) {
-          URL.revokeObjectURL(`http://localhost:7075${xhr.response}`);
+          URL.revokeObjectURL(`https://ajh-diploma.herokuapp.com${xhr.response}`);
         }
       });
 

@@ -164,7 +164,7 @@ export default class Widget {
         this.messageList.scrollTop = this.messageList.scrollHeight;
         messageInput.value = '';
 
-        const api = new API('http://localhost:7075/newMessage');
+        const api = new API('https://ajh-diploma.herokuapp.com/newMessage');
         this.toServerNewMessage(spanEl.id, spanEl.textContent, api);
       }
     });
@@ -249,7 +249,7 @@ export default class Widget {
           localParent.classList.add('favorite');
 
           // отправляем на сервер
-          const api = new API('http://localhost:7075/addFavorite');
+          const api = new API('https://ajh-diploma.herokuapp.com/addFavorite');
           // console.log(localParent.textContent);
           this.toServerNewFavorite(localParent.id, localParent.textContent, api);
         } else {
@@ -259,7 +259,7 @@ export default class Widget {
 
           // удаление с сервера
           const idEl = localParent.id;
-          const api = new API('http://localhost:7075/dellFavorite');
+          const api = new API('https://ajh-diploma.herokuapp.com/dellFavorite');
           console.info(`id for delete = ${idEl}`);
           this.removeElById(api, idEl);
           // удаление с сервера
@@ -331,13 +331,13 @@ export default class Widget {
   // работа с сервером
   loadFavoriteMessages() {
     console.log('Загружаю с сервера избранные...');
-    const api = new API('http://localhost:7075/showFavorite');
+    const api = new API('https://ajh-diploma.herokuapp.com/showFavorite');
     this.fromServerFavorite(api);
   }
 
   loadMessages() {
     console.log('Загружаю с сервера данные...');
-    const api = new API('http://localhost:7075/showMessages');
+    const api = new API('https://ajh-diploma.herokuapp.com/showMessages');
     this.fromServerMessages(api);
   }
 
